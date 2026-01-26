@@ -30,7 +30,7 @@ pub struct Escrow {
 #[contracttype]
 pub enum DataKey {
     Admin,
-    Paused,
+    State,
     Escrows,
 }
 
@@ -41,23 +41,24 @@ pub struct VaultixContract;
 impl VaultixContract {
     pub fn init(env: Env, admin: Address) {
         env.storage().persistent().set(&DataKey::Admin, &admin);
-        env.storage().persistent().set(&DataKey::Paused, &false);
+        env.storage().persistent().set(&DataKey::State, &State::Active);
         env.storage().persistent().set(&DataKey::Escrows, &Map::<u64, Escrow>::new(&env));
     }
 
     pub fn set_paused(env: Env, paused: bool) {
         let admin: Address = env.storage().persistent().get(&DataKey::Admin).unwrap();
-        env.require_auth(&admin);
-        env.storage().persistent().set(&DataKey::Paused, &paused);
+        let state = if paused { State::Paused } else { State::Active };
+        env.storage().persistent().set(&DataKey::State, &state);
     }
 
     pub fn is_paused(env: Env) -> bool {
-        env.storage().persistent().get(&DataKey::Paused).unwrap_or(false)
+        let state: State = env.storage().persistent().get(&DataKey::State).unwrap_or(State::Active);
+        matches!(state, State::Paused)
     }
 
     fn check_active(env: &Env) {
-        let paused: bool = env.storage().persistent().get(&DataKey::Paused).unwrap_or(false);
-        if paused {
+        let state: State = env.storage().persistent().get(&DataKey::State).unwrap_or(State::Active);
+        if matches!(state, State::Paused) {
             panic!("Contract is paused");
         }
     }

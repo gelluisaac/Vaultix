@@ -1,5 +1,5 @@
 use super::*;
-use soroban_sdk::{testutils::{Address as _, MockAuth, MockAuthInvoke}, Address, Env, vec};
+use soroban_sdk::{testutils::{Address as _, MockAuth, MockAuthInvoke}, Address, Env, vec, Val};
 
 #[test]
 fn test_circuit_breaker() {
@@ -27,7 +27,7 @@ fn test_circuit_breaker() {
         invoke: &MockAuthInvoke {
             contract: &contract_id,
             fn_name: "set_paused",
-            args: vec![],
+            args: vec![&env],
             sub_invokes: &[],
         },
     }]);
@@ -40,7 +40,7 @@ fn test_circuit_breaker() {
         invoke: &MockAuthInvoke {
             contract: &contract_id,
             fn_name: "set_paused",
-            args: vec![],
+            args: vec![&env],
             sub_invokes: &[],
         },
     }]);
@@ -71,7 +71,7 @@ fn test_create_escrow_paused() {
         invoke: &MockAuthInvoke {
             contract: &contract_id,
             fn_name: "set_paused",
-            args: vec![],
+            args: vec![&env],
             sub_invokes: &[],
         },
     }]);
@@ -98,7 +98,7 @@ fn test_confirm_delivery_paused() {
         invoke: &MockAuthInvoke {
             contract: &contract_id,
             fn_name: "set_paused",
-            args: vec![],
+            args: vec![&env],
             sub_invokes: &[],
         },
     }]);
